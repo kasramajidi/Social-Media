@@ -6,11 +6,24 @@ const port = process.env.PORT;
 
 
 
-(async () => {
-    await mongoose.connect(process.env.MONGO__URI)
-    console.log("mongodb connected")
-})();
+function dataBase() {
+    (async () => {
+        await mongoose.connect(process.env.MONGO__URI)
+        console.log("mongodb connected")
+    })();
+}
 
-app.listen(port, () => {
-    console.log(`server started on port ${port}`)
-})
+function startServer() {
+    app.listen(port, () => {
+        console.log(`server started on port ${port}`)
+    })
+}
+
+
+function run() {
+    startServer();
+    dataBase();
+}
+
+
+run()
