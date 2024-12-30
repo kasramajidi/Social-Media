@@ -17,7 +17,6 @@ app.use(setHeaders)
 //* template engine ejs
 app.set("view engine", "ejs")
 app.set("views", path.join(__dirname, "views"))
-app.set("pages", path.join(__dirname, "pages"))
 
 //* static Folders
 app.use("/css", express.static(path.join(__dirname, "../public/css")))

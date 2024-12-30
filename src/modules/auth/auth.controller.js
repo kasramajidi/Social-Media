@@ -2,7 +2,7 @@ const userModel = require("../../models/user")
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { registerValidationSchema } = require("./auth.validator")
 
-exports.register = async (req, res) => {
+exports.register = async (req, res, next) => {
     try {
         const { email, password, name, username } = req.body
 
@@ -30,7 +30,7 @@ exports.register = async (req, res) => {
             role: "ADMIN"
         }
 
-        const registerUser = new userModel({
+         registerUser = new userModel({
             email,
             password,
             username,
@@ -42,9 +42,13 @@ exports.register = async (req, res) => {
 
         return successResponse(res, 200, {
             message: "User Created Successfully :))",
-            user: { ...registerUser, password: undefined }
+            user: { ...registerUser.toObject(), password: undefined }
         })
     } catch (err) {
         next(err)
     }
+}
+
+exports.showRegisterView = async (req, res) => {
+    return res.render("auth/register")
 }

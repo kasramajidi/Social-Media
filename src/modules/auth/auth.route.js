@@ -4,6 +4,7 @@ const authRouter = express.Router()
 
 authRouter
     .route("/register")
+    .get(authController.showRegisterView)
     .post(authController.register)
 
 module.exports = authRouter
