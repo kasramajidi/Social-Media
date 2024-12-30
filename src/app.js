@@ -4,6 +4,8 @@ const path = require("path")
 
 
 const { setHeaders } = require("./middlewares/header")
+const { errorHandler } = require("./middlewares/errorHandler")
+const authRouter = require("./modules/auth/auth.route")
 
 //*body-parser
 app.use(express.urlencoded({ extended: true, limit: "50mb" }))
@@ -15,6 +17,7 @@ app.use(setHeaders)
 //* template engine ejs
 app.set("view engine", "ejs")
 app.set("views", path.join(__dirname, "views"))
+app.set("pages", path.join(__dirname, "pages"))
 
 //* static Folders
 app.use("/css", express.static(path.join(__dirname, "../public/css")))
@@ -22,11 +25,13 @@ app.use("/fonts", express.static(path.join(__dirname, "../public/fonts")))
 app.use("/images", express.static(path.join(__dirname, "../public/images")))
 app.use("/js", express.static(path.join(__dirname, "../public/js")))
 
+
 //* Routes
 app.get("/", (req, res) => {
     return res.render("homePage")
 })
 
+app.use("/auth", authRouter)
 
 
 //* 404 Error Handler
@@ -37,5 +42,7 @@ app.use((req, res) => {
     })
 })
 
+//! errorHandler all
+// app.use(errorHandler)
 
 module.exports = app
