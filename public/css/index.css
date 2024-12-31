@@ -35,6 +35,8 @@ a {
     text-decoration: none;
 }
 
+
+
 /* Application Fonts */
 @font-face {
     font-family: 'Poppins-Light';
@@ -1399,7 +1401,11 @@ button {
     z-index: 60;
 }
 
-
+.swal-footer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 :root {
     --main-color: rgb(129, 66, 174);
