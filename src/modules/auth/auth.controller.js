@@ -1,8 +1,9 @@
 const userModel = require("../../models/user")
 const refreshTokenModel = require("../../models/refreshToken")
 const { errorResponse, successResponse } = require("../../utils/responses");
-const { registerValidationSchema } = require("./auth.validator")
+const { registerValidationSchema, loginValidationSchema } = require("./auth.validator")
 const jwt = require("jsonwebtoken")
+const bcrypt = require("bcrypt")
 
 exports.register = async (req, res, next) => {
     try {
@@ -68,4 +69,51 @@ exports.register = async (req, res, next) => {
 
 exports.showRegisterView = async (req, res) => {
     return res.render("auth/register")
+}
+
+exports.showLoginView = async (req, res) => {
+    return res.render("auth/login")
+}
+
+exports.login = async (req, res, next) => {
+    try {
+        const { email, password } = req.body;
+
+        await loginValidationSchema.validate({
+            email,
+            password,
+        }, {
+            abortEarly: false,
+        })
+
+        const user = await userModel.findOne({ email }).lean()
+
+        if (!user) {
+            req.flash("error", "Password Or Email is not correct")
+            return res.redirect("/auth/login")
+        }
+
+        const isPasswordMatch = await bcrypt.compare(password, user.password)
+
+        if (!isPasswordMatch) {
+            req.flash("error", "Password Or Email is not correct")
+            return res.redirect("/auth/login")
+        }
+
+        const accessToken = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, {
+            expiresIn: "30day"
+        });
+
+        const refreshToken = await refreshTokenModel.createToken(user)
+
+        res.cookie("access-token", accessToken, { maxAge: 900_00, httpOnly: true })
+        res.cookie("refresh-token", refreshToken, { maxAge: 900_00, httpOnly: true })
+
+
+        req.flash("success", "signed in was Successfully")
+
+        return res.redirect("/auth/login")
+    } catch (err) {
+        next(err)
+    }
 }
