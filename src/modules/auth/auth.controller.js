@@ -1,6 +1,8 @@
 const userModel = require("../../models/user")
+const refreshTokenModel = require("../../models/refreshToken")
 const { errorResponse, successResponse } = require("../../utils/responses");
 const { registerValidationSchema } = require("./auth.validator")
+const jwt = require("jsonwebtoken")
 
 exports.register = async (req, res, next) => {
     try {
@@ -32,7 +34,7 @@ exports.register = async (req, res, next) => {
             role: "ADMIN"
         }
 
-        registerUser = new userModel({
+        let registerUser = new userModel({
             email,
             password,
             username,
@@ -41,8 +43,18 @@ exports.register = async (req, res, next) => {
 
         registerUser = await registerUser.save()
 
+        const accessToken = jwt.sign({ userID: registerUser._id }, process.env.JWT_SECRET, {
+            expiresIn: "30day"
+        });
+
+        const refreshToken = await refreshTokenModel.createToken(registerUser)
+
+        res.cookie("access-token", accessToken, { maxAge: 900_00, httpOnly: true })
+        res.cookie("refresh-token", refreshToken, { maxAge: 900_00, httpOnly: true })
+
+
         req.flash("success", "signed up was Successfully")
-        
+
         return res.redirect("/auth/register")
 
         // return successResponse(res, 200, {
