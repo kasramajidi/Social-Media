@@ -26,7 +26,10 @@
                     <a href="#" class="text-indigo-700 font-Poppins-SemiBold">Login</a>
                 </div>
             </header>
-
+            <br/>
+            <% if(locals.messages.error){%>
+                <h3 style="color: red;"><%= locals.messages.error%></h3>
+            <%}%>
             <main class="mt-10">
                 <div class="auth-input-card">
                     <label for="register_fullName" class="font-Poppins-Medium">

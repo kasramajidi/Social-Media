@@ -6,6 +6,8 @@ const path = require("path")
 const { setHeaders } = require("./middlewares/header")
 const { errorHandler } = require("./middlewares/errorHandler")
 const authRouter = require("./modules/auth/auth.route")
+const flash = require("express-flash")
+const session = require("express-session")
 
 //*body-parser
 app.use(express.urlencoded({ extended: true, limit: "50mb" }))
@@ -13,6 +15,16 @@ app.use(express.json({ limit: "50mb" }))
 
 //* cors policy
 app.use(setHeaders)
+
+//* express-flash
+app.use(
+    session({
+      secret: "Secret Key",
+      resave: false,
+      saveUninitialized: false,
+    })
+  );
+  app.use(flash());
 
 //* template engine ejs
 app.set("view engine", "ejs")
