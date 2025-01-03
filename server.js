@@ -1,41 +1,39 @@
-const app = require("./src/app")
-const mongoose = require("mongoose")
-const dotenv = require("dotenv")
+const app = require("./src/app");
+const { default: mongoose } = require("mongoose");
+const dotenv = require("dotenv");
 
 //* Load ENV
-
-const productionMode = process.env.MODE_ENV === "production"
-
+const productionMode = process.env.NODE_ENV === "production";
 if (!productionMode) {
-    dotenv.config()
+  dotenv.config();
 }
 
-//* DataBase
-async function dataBase() {
-    try {
-
-        await mongoose.connect(process.env.MONGO__URI)
-        console.log(`mongodb connected ${mongoose.connection.host}`)
-
-    } catch (err) {
-        console.error("error in database -> ", err)
-        process.exit(1);
-    }
+//* Database connection
+async function connectToDB() {
+  try {
+    await mongoose.connect(process.env.MONGO__URI);
+    console.log(`MongoDB Connected Successfully: ${mongoose.connection.host}`);
+  } catch (err) {
+    console.error(`Error in DB connection ->`, err);
+    process.exit(1);
+  }
 }
 
 function startServer() {
-    const port = +process.env.PORT || 5000;
-    app.listen(port, () => {
-        console.log(`server running in ${productionMode ? "production" : "development"
-            } on port ${port}`)
-    })
+  const port = +process.env.PORT || 5000;
+  app.listen(port, () => {
+    console.log(
+      `Server running in ${
+        productionMode ? "production" : "development"
+      } mode on port ${port}`
+    );
+  });
 }
 
-
-function run() {
-    startServer();
-    dataBase();
+async function run() {
+  startServer();
+  await connectToDB();
+  // Folan()
 }
 
-
-run()
+run();

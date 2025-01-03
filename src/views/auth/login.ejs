@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> SabzSocial | Login</title>
+    <title>Login</title>
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="/css/styles.css">
 </head>
@@ -26,10 +26,10 @@
 
                 <div class="auth-input-card">
                     <label for="register_username" class="font-Poppins-Medium">
-                         email
+                        Email
                     </label>
                     <div class="relative flex input-card items-center">
-                        <input id="register_username" type="text" name="email" class="auth-input"
+                        <input id="register_username" name="email" type="text" class="auth-input"
                             placeholder="Please enter the your username..">
                         <span class="absolute left-2 top-4 text-gray-300">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -50,7 +50,7 @@
                         Password
                     </label>
                     <div class="relative flex input-card items-center">
-                        <input id="register_password" type="password" name="password" class="auth-input"
+                        <input id="register_password" name="password" type="password" class="auth-input"
                             placeholder="Please enter the your password..">
                         <span class="absolute left-2 top-4 text-gray-300">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -89,21 +89,19 @@
 
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script>
-        if ("<%= locals.messages.error%>"){
+        if ("<%= locals.messages.error %>") {
             swal({
-                title: "<%= locals.messages.error%>",
+                title: "<%= locals.messages.error %>",
                 icon: "error",
                 buttons: "Try Again"
-            })
-        }else if ("<%= locals.messages.success%>"){
+            });
+        } else if ("<%= locals.messages.success %>") {
             swal({
-                title: "<%= locals.messages.success%>",
+                title: "<%= locals.messages.success %>",
                 icon: "success",
-                buttons: "ok"
-            })
+                buttons: "Huraaa 😍"
+            });
         }
-
-
     </script>
 </body>
 

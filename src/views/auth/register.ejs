@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Social | Register</title>
+    <title>Register</title>
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="/css/styles.css">
 </head>
@@ -26,14 +26,14 @@
                     <a href="#" class="text-indigo-700 font-Poppins-SemiBold">Login</a>
                 </div>
             </header>
-            
+
             <main class="mt-10">
                 <div class="auth-input-card">
                     <label for="register_fullName" class="font-Poppins-Medium">
                         Full name
                     </label>
                     <div class="relative flex input-card items-center">
-                        <input id="register_fullName" type="text" name="name" class="auth-input"
+                        <input id="register_fullName" name="name" type="text" class="auth-input"
                             placeholder="Please enter the your full name..">
                         <span class="absolute left-2 top-4 text-gray-300">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -51,7 +51,7 @@
                         Username
                     </label>
                     <div class="relative flex input-card items-center">
-                        <input id="register_username" type="text" name="username" class="auth-input"
+                        <input id="register_username" name="username" type="text" class="auth-input"
                             placeholder="Please enter the your username..">
                         <span class="absolute left-2 top-4 text-gray-300">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -70,7 +70,7 @@
                         Email address
                     </label>
                     <div class="relative flex input-card items-center">
-                        <input id="register_email" type="email" name="email" class="auth-input"
+                        <input id="register_email" name="email" type="email" class="auth-input"
                             placeholder="Please enter the your username..">
                         <span class="absolute left-2 top-4 text-gray-300">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -88,7 +88,7 @@
                         Password
                     </label>
                     <div class="relative flex input-card items-center">
-                        <input id="register_password" type="password" name="password" class="auth-input"
+                        <input id="register_password" name="password" type="password" class="auth-input"
                             placeholder="Please enter the your password..">
                         <span class="absolute left-2 top-4 text-gray-300">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -115,23 +115,23 @@
     </div>
 
     </form>
+
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script>
-        if ("<%= locals.messages.error%>"){
+        if ("<%= locals.messages.error %>") {
             swal({
-                title: "<%= locals.messages.error%>",
+                title: "<%= locals.messages.error %>",
                 icon: "error",
                 buttons: "Try Again"
-            })
-        }else if ("<%= locals.messages.success%>"){
+            });
+        } else if ("<%= locals.messages.success %>") {
             swal({
-                title: "<%= locals.messages.success%>",
+                title: "<%= locals.messages.success %>",
                 icon: "success",
-                buttons: "ok"
-            })
+                buttons: "Huraaa 😍"
+            });
         }
-
-
     </script>
 </body>
+
 </html>

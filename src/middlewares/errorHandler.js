@@ -1,3 +1,3 @@
-const errorHandler = (req, res, next, err) => {
-    
-}
+exports.errorHandler = (err, req, res, next) => {
+  // Codes
+};

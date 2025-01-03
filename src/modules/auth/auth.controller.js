@@ -1,119 +1,133 @@
-const userModel = require("../../models/user")
-const refreshTokenModel = require("../../models/refreshToken")
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const { errorResponse, successResponse } = require("../../utils/responses");
-const { registerValidationSchema, loginValidationSchema } = require("./auth.validator")
-const jwt = require("jsonwebtoken")
-const bcrypt = require("bcrypt")
-
-exports.register = async (req, res, next) => {
-    try {
-        const { email, password, name, username } = req.body
-
-        await registerValidationSchema.validate({
-            email,
-            password,
-            name,
-            username
-        }, {
-            abortEarly: false,
-        })
-
-        const isExistUser = await userModel.findOne({
-            $or: [{ username }, { email }]
-        })
-
-        if (isExistUser) {
-            req.flash("error", "Email And username already Exist")
-            return res.redirect('/auth/register');
-            // return errorResponse(res, 400, "Email And username already Exist")
-        }
-
-        const isFirstUser = (await userModel.countDocuments()) === 0;
-        let role = "USER"
-
-        if (isFirstUser) {
-            role: "ADMIN"
-        }
-
-        let registerUser = new userModel({
-            email,
-            password,
-            username,
-            name
-        })
-
-        registerUser = await registerUser.save()
-
-        const accessToken = jwt.sign({ userID: registerUser._id }, process.env.JWT_SECRET, {
-            expiresIn: "30day"
-        });
-
-        const refreshToken = await refreshTokenModel.createToken(registerUser)
-
-        res.cookie("access-token", accessToken, { maxAge: 900_00, httpOnly: true })
-        res.cookie("refresh-token", refreshToken, { maxAge: 900_00, httpOnly: true })
-
-
-        req.flash("success", "signed up was Successfully")
-
-        return res.redirect("/auth/register")
-
-        // return successResponse(res, 200, {
-        //     message: "User Created Successfully :))",
-        //     user: { ...registerUser.toObject(), password: undefined }
-        // })
-    } catch (err) {
-        next(err)
-    }
-}
+const UserModel = require("./../../models/User");
+const RefreshTokenModel = require("./../../models/RefreshToken");
+const {
+  registerValidationSchema,
+  loginValidationSchema,
+} = require("./auth.validator");
 
 exports.showRegisterView = async (req, res) => {
-    return res.render("auth/register")
-}
+  return res.render("auth/register");
+};
+
+exports.register = async (req, res, next) => {
+  try {
+    const { email, username, name, password } = req.body;
+
+    await registerValidationSchema.validate(
+      {
+        email,
+        username,
+        name,
+        password,
+      },
+      {
+        abortEarly: false,
+      }
+    );
+
+    const isExistUser = await UserModel.findOne({
+      $or: [{ username }, { email }],
+    });
+
+    if (isExistUser) {
+      req.flash("error", "Email or username already exist");
+
+      return res.redirect("/auth/register");
+      // return errorResponse(res, 400, "Email or username already exist !!");
+    }
+
+    const isFirstUser = (await UserModel.countDocuments()) === 0;
+    let role = "USER";
+    if (isFirstUser) {
+      role = "ADMIN";
+    }
+
+    let user = new UserModel({ email, username, password, name });
+    user = await user.save();
+
+    const accessToken = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "30day",
+    });
+
+    const refreshToken = await RefreshTokenModel.createToken(user);
+
+    res.cookie("access-token", accessToken, {
+      maxAge: 900_000,
+      httpOnly: true,
+    });
+    res.cookie("refresh-token", refreshToken, {
+      maxAge: 900_000,
+      httpOnly: true,
+    });
+
+    req.flash("success", "Signed up was successfully");
+
+    return res.redirect("/auth/register");
+
+    // return successResponse(res, 201, {
+    //   message: "User created successfully :))",
+    //   user: { ...user.toObject(), password: undefined },
+    //   accessToken
+    // });
+  } catch (err) {
+    next(err);
+  }
+};
 
 exports.showLoginView = async (req, res) => {
-    return res.render("auth/login")
-}
+  return res.render("auth/login");
+};
 
 exports.login = async (req, res, next) => {
-    try {
-        const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-        await loginValidationSchema.validate({
-            email,
-            password,
-        }, {
-            abortEarly: false,
-        })
+    await loginValidationSchema.validate(
+      {
+        email,
+        password,
+      },
+      {
+        abortEarly: false,
+      }
+    );
 
-        const user = await userModel.findOne({ email }).lean()
+    const user = await UserModel.findOne({ email }).lean();
 
-        if (!user) {
-            req.flash("error", "Password Or Email is not correct")
-            return res.redirect("/auth/login")
-        }
-
-        const isPasswordMatch = await bcrypt.compare(password, user.password)
-
-        if (!isPasswordMatch) {
-            req.flash("error", "Password Or Email is not correct")
-            return res.redirect("/auth/login")
-        }
-
-        const accessToken = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, {
-            expiresIn: "30day"
-        });
-
-        const refreshToken = await refreshTokenModel.createToken(user)
-
-        res.cookie("access-token", accessToken, { maxAge: 900_00, httpOnly: true })
-        res.cookie("refresh-token", refreshToken, { maxAge: 900_00, httpOnly: true })
-
-
-        req.flash("success", "signed in was Successfully")
-
-        return res.redirect("/auth/login")
-    } catch (err) {
-        next(err)
+    if (!user) {
+      req.flash("error", "User not found !!");
+      return res.redirect("/auth/login");
     }
-}
+
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
+      req.flash("error", "Invalid Email Or Password !!");
+      return res.redirect("/auth/login");
+    }
+
+    const accessToken = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "30day",
+    });
+
+    const refreshToken = await RefreshTokenModel.createToken(user);
+
+    res.cookie("access-token", accessToken, {
+      maxAge: 900_000,
+      httpOnly: true,
+    });
+
+    res.cookie("refresh-token", refreshToken, {
+      maxAge: 900_000,
+      httpOnly: true,
+    });
+
+    req.flash("success", "Signed In was successfully");
+
+    return res.redirect("/auth/login");
+  } catch (err) {
+    next(err);
+  }
+};
