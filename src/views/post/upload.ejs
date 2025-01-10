@@ -171,22 +171,21 @@
     <!-- Footer -->
 
     <!-- Scripts -->
-    <script src="/src/Functions/index.js"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="/js/sweetalert.js"></script>
     <script>
-        if ("<%= locals.messages.error %>") {
-            swal({
-                title: "<%= locals.messages.error %>",
-                icon: "error",
-                buttons: "post is not successfully"
-            });
-        } else if ("<%= locals.messages.success %>") {
-            swal({
-                title: "<%= locals.messages.success %>",
-                icon: "success",
-                buttons: "post successfully created"
-            });
-        }
+      if ("<%= locals.messages.error %>") {
+        swal({
+          title: "<%= locals.messages.error %>",
+          icon: "error",
+          buttons: "Try Again",
+        });
+      } else if ("<%= locals.messages.success %>") {
+        swal({
+          title: "<%= locals.messages.success %>",
+          icon: "success",
+          buttons: "Huraaa 😍",
+        });
+      }
     </script>
   </body>
 </html>
