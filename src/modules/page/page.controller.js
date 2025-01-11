@@ -1,12 +1,13 @@
 const hasAccessToPage = require("../../utils/hasAccessToPage");
 const FollowModel = require("./../../models/Follow");
 const UserModel = require("../../models/User");
-const { use } = require("./page.routes");
+
 
 exports.getPage = async (req, res, next) => {
   try {
     const user = req.user;
     const { pageID } = req.params;
+
     const hasAccess = await hasAccessToPage(user._id, pageID);
 
     const followed = await FollowModel.findOne({
@@ -14,16 +15,42 @@ exports.getPage = async (req, res, next) => {
       following: pageID,
     });
 
+    const page = await UserModel.findOne(
+      { _id: pageID },
+      "name username biography isVerified"
+    ).lean();
+
     if (!hasAccess) {
       req.flash("error", "Follow page to show content");
       return res.render("page/index", {
         followed: Boolean(followed),
         pageID,
+        followers: [],
+        followings: [],
+        hasAccess: false,
+        page,
       });
     }
+
+    let followers = await FollowModel.find({
+      following: pageID
+    }).populate("follower", "name username")
+
+    followers = followers.map((item) => item.follower)
+
+    let followings = await FollowModel.find({
+      follower: pageID
+    }).populate("following", "name username")
+
+    followings = followings.map((item) => item.following)
+
     return res.render("page/index", {
       followed: Boolean(followed),
       pageID,
+      followers,
+      followings,
+      hasAccess: true,
+      page
     });
   } catch (err) {
     next(err);
