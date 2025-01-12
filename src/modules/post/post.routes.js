@@ -16,4 +16,11 @@ router
   .get(auth, AccountVerify, controller.showPostUploadView)
   .post(auth, upload.single("media"), controller.createPost);
 
+router
+  .route("/like")
+  .post(auth, controller.like)
+
+  router
+  .route("/dislike")
+  .post(auth, controller.dislike)
 module.exports = router;
