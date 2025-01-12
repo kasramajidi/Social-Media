@@ -74,7 +74,7 @@
 
             <!-- Profile Image -->
             <span class="profile-pic-card">
-              <img src="/images/profile-3.jpg" class="profile-pic" alt="" />
+              <img src="http://localhost:5000/<%= page.profilePicture %>" class="profile-pic" alt="" />
             </span>
           </header>
           <main class="profile-main">
@@ -135,7 +135,7 @@
               <div class="flex items-center gap-2">
                 <% if (own) {%>
                   <a
-                    href="/src/Pages/ProfileUpdate/Hosna/index.html"
+                    href="/users/edit-profile"
                     class="min-w-max flex items-center gap-1 manage-button"
                   >
                     <span> Manage </span>
@@ -189,7 +189,7 @@
                   <div>
                     <header>
                       <img
-                        src="/images/profile-11.jpg"
+                        src="http://localhost:5000/<%= post.user.profilePicture %>"
                         alt="profile picture"
                         class="feed-profile-picture"
                       />
