@@ -1,15 +1,16 @@
-const express = require("express")
-const userController = require("./user.controller")
-const auth = require("../../middlewares/auth")
-const {multerStorage} = require("../../middlewares/uploaderConfigs")
-const userRouter = express.Router()
-const upload = multerStorage("public/images/profile")
+const express = require("express");
+const controller = require("./user.controller");
+const auth = require("../../middlewares/auth");
+const { multerStorage } = require("./../../middlewares/uploaderConfigs");
 
-userRouter
-    .route("/edit-profile")
-    .get(auth, userController.showPageEditView)
+const router = new express.Router();
+const upload = multerStorage("public/images/profiles");
 
-userRouter
-    .route("/profile-picture")
-    .post(auth, upload.single("profile"), userController.updateProfile)
-module.exports = userRouter;
+// Route
+router.route("/edit-profile").get(auth, controller.showPageEditView);
+
+router
+  .route("/profile-picture")
+  .post(auth, upload.single("profile"), controller.updateProfile);
+
+module.exports = router;

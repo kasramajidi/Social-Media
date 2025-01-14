@@ -1,14 +1,14 @@
 const hasAccessToPage = require("../../utils/hasAccessToPage");
 const FollowModel = require("./../../models/Follow");
-const UserModel = require("../../models/User");
-const postModel = require("../../models/Post");
-const likeModel = require("../../models/Like");
+const UserModel = require("./../../models/User");
+const PostModel = require("./../../models/Post");
+const LikeModel = require("./../../models/Like");
+const SaveModel = require("./../../models/Save");
 
 exports.getPage = async (req, res, next) => {
   try {
     const user = req.user;
     const { pageID } = req.params;
-
     const hasAccess = await hasAccessToPage(user._id, pageID);
 
     const followed = await FollowModel.findOne({
@@ -30,57 +30,70 @@ exports.getPage = async (req, res, next) => {
         followings: [],
         hasAccess: false,
         page,
-        posts
+        posts: [],
       });
     }
 
-    let followers = await FollowModel.find({
-      following: pageID
-    }).populate("follower", "name username")
+    let followers = await FollowModel.find({ following: pageID }).populate(
+      "follower",
+      "name username"
+    );
 
-    followers = followers.map((item) => item.follower)
+    followers = followers.map((item) => item.follower);
 
-    let followings = await FollowModel.find({
-      follower: pageID
-    }).populate("following", "name username")
+    let followings = await FollowModel.find({ follower: pageID }).populate(
+      "following",
+      "name username"
+    );
 
-    followings = followings.map((item) => item.following)
+    followings = followings.map((item) => item.following);
 
-    const own = user._id.toString() === pageID
+    const own = user._id.toString() === pageID;
 
-    const posts = await postModel.find({ user: pageID }).sort({ _id: -1 }).populate("user", "name username profilePicture").lean()
+    const posts = await PostModel.find({ user: pageID })
+      .sort({ _id: -1 })
+      .populate("user", "name username profilePicture")
+      .lean();
 
-    const likes = await likeModel
-      .find({ user: user._id })
+    const likes = await LikeModel.find({ user: user._id })
       .populate("user", "_id")
-      .populate("post", "_id")
+      .populate("post", "_id");
 
-    let postWithLikes = []
-    
+    const saves = await SaveModel.find({ user: user._id })
+      .populate("user", "_id")
+      .populate("post", "_id");
+
     posts.forEach((post) => {
-      if (likes.length){
+      if (likes.length) {
         likes.forEach((like) => {
-          if (like.post._id.toString() === post._id.toString()){
-            postWithLikes.push({...post, hasLike: true})
-          }else{
-            postWithLikes.push({...post})
+          if (like.post._id.toString() === post._id.toString()) {
+            post.hasLike = true;
           }
-        })
-      }else{
-        postWithLikes = [...posts]
+        });
       }
-    })
+    });
 
+    posts.forEach((post) => {
+      if (saves.length) {
+        saves.forEach((save) => {
+          if (save.post._id.toString() === post._id.toString()) {
+            post.isSaved = true;
+          }
+        });
+      }
+    });
+
+    console.log(posts);
 
     return res.render("page/index", {
       followed: Boolean(followed),
       pageID,
+      hasAccess: true,
       followers,
       followings,
-      hasAccess: true,
       page,
-      posts: postWithLikes,
-      own
+      own,
+      posts,
     });
   } catch (err) {
     next(err);
@@ -90,37 +103,36 @@ exports.getPage = async (req, res, next) => {
 exports.follow = async (req, res, next) => {
   try {
     const user = req.user;
-    const { pageID } = req.params
+    const { pageID } = req.params;
 
-    const targetOnePage = await UserModel.findOne({ _id: pageID })
-
-    if (!targetOnePage) {
-      req.flash("error", "page not found to follow");
-      return res.redirect(`/pages/${pageID}`);;
+    const targetOwnPage = await UserModel.findOne({ _id: pageID });
+    if (!targetOwnPage) {
+      req.flash("error", "Page not found to follow !!");
+      return res.redirect(`/pages/${pageID}`);
     }
 
     if (user._id.toString() === pageID) {
-      req.flash("error", "you cannot follow your page");
-      return res.redirect(`/pages/${pageID}`);;
+      req.flash("error", "You cannot follow yourself");
+      return res.redirect(`/pages/${pageID}`);
     }
 
     const existingFollow = await FollowModel.findOne({
       follower: user._id,
-      following: pageID
-    })
+      following: pageID,
+    });
 
     if (existingFollow) {
-      req.flash("error", "page already followed");
-      return res.redirect(`/pages/${pageID}`);;
+      req.flash("error", "Page already followed !!");
+      return res.redirect(`/pages/${pageID}`);
     }
 
     await FollowModel.create({
       follower: user._id,
-      following: pageID
-    })
+      following: pageID,
+    });
 
-    req.flash("success", "page followed successfully");
-    return res.redirect(`/pages/${pageID}`);;
+    req.flash("success", "Page followed successfully :))");
+    return res.redirect(`/pages/${pageID}`);
   } catch (err) {
     next(err);
   }
@@ -128,21 +140,21 @@ exports.follow = async (req, res, next) => {
 
 exports.unFollow = async (req, res, next) => {
   try {
-    const user = req.user
-    const { pageID } = req.params
+    const user = req.user;
+    const { pageID } = req.params;
 
-    const unFollowPage = await FollowModel.findOneAndDelete({
+    const unFollowedPage = await FollowModel.findOneAndDelete({
       follower: user._id,
-      following: pageID
-    })
+      following: pageID,
+    });
 
-    if (!unFollowPage) {
-      req.flash("error", "you didn't follow this page");
-      return res.redirect(`/pages/${pageID}`);;
+    if (!unFollowedPage) {
+      req.flash("error", "You didn't follow this page !!");
+      return res.redirect(`/pages/${pageID}`);
     }
 
-    req.flash("success", "page unFollowed successfully");
-    return res.redirect(`/pages/${pageID}`);;
+    req.flash("success", "Page unFollowed successfully :))");
+    return res.redirect(`/pages/${pageID}`);
   } catch (err) {
     next(err);
   }
