@@ -827,7 +827,7 @@
               <p class="text-sm text-gray-700">
                 Add a comment:
               </p>
-              <form id="comment-form">
+              <form id="comment-form" method="post" action="/posts/new-comment">
                 <div class="mt-2">
                   <textarea name="content" class="w-full  bg-gray-100 p-5 rounded-lg font-light" placeholder="Write something to share ..."></textarea>
                 </div>
@@ -844,7 +844,10 @@
           <p class="text-sm text-gray-600 my-3">
           Comments</p>
           </div>
+          <% if(hasAccess) { %>
+            <% if(comments.length > 0) { %>
             
+            <% comments.forEach(comment => { %>
           <div class="border bg-gray-100 p-5 my-3 rounded-md shadow-sm">
             <div class="flex items-center gap-2 mb-1">
               <img
@@ -858,7 +861,7 @@
               </div>
             </div>
             <div class="ml-6 pl-4 mt-4">
-              <q> I love this post :)) </q>
+              <q> <%= comment.content %> </q>
             </div>
             <div class="mt-4 flex-between">
               <div class="flex items-center gap-1">
@@ -902,7 +905,14 @@
               </button>
             </div>
           </div>
+          <% }) %>
+          <% } else { %>
+          <h1 style="text-align: center">No comments !!</h1>
 
+            <% } %>
+        <% } else { %>            
+          <h1 style="text-align: center">You can't access to comments</h1>
+        <% } %>
           </footer>
       </section>
     </section>

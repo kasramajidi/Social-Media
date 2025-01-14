@@ -4,6 +4,7 @@ const UserModel = require("./../../models/User");
 const PostModel = require("./../../models/Post");
 const LikeModel = require("./../../models/Like");
 const SaveModel = require("./../../models/Save");
+const commentModel = require("../../models/Comment");
 
 exports.getPage = async (req, res, next) => {
   try {
@@ -30,6 +31,7 @@ exports.getPage = async (req, res, next) => {
         followings: [],
         hasAccess: false,
         page,
+        comments,
         posts: [],
       });
     }
@@ -83,7 +85,11 @@ exports.getPage = async (req, res, next) => {
       }
     });
 
-    console.log(posts);
+    const comments = await commentModel
+      .find({user: user._id})      
+      .select("content")
+      .lean()
+    console.log(comments)
 
     return res.render("page/index", {
       followed: Boolean(followed),
@@ -94,6 +100,7 @@ exports.getPage = async (req, res, next) => {
       page,
       own,
       posts,
+      comments
     });
   } catch (err) {
     next(err);

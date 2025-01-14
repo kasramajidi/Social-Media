@@ -5,7 +5,8 @@ const SaveModel = require("./../../models/Save");
 const hasAccessToPage = require("./../../utils/hasAccessToPage");
 const { getUserInfo } = require("../../utils/helper");
 const path = require("path");
-const fs = require("fs")
+const fs = require("fs");
+const commentModel = require("../../models/Comment");
 
 exports.showPostUploadView = async (req, res) => {
   return res.render("post/upload");
@@ -230,6 +231,33 @@ exports.removePost = async (req, res, next) => {
     req.flash("success", "Post removed successfully :))");
     return res.redirect("back");
 
+  } catch (err) {
+    next(err)
+  }
+}
+
+exports.addComment = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const {content, postID} = req.body;
+
+    // if (!user.isVerified){
+    //   req.flash("error", "first login for submit commit")
+    //   return res.redirect("back")
+    // }
+
+    const post = await PostModel.findOne({_id: postID})
+
+    if (!post){
+      //! error
+    }
+
+    const comment = new commentModel({content, user: user._id, post: postID})
+
+    comment.save();
+
+    req.flash("success", "commit submit successfully")
+    return res.redirect("back")
   } catch (err) {
     next(err)
   }

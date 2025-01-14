@@ -26,5 +26,6 @@ router.route("/saves").get(auth, controller.showSavesView);
 
 router.route("/:postID/remove").post(auth, controller.removePost);
 
+router.route("/new-comment").post(auth, controller.addComment);
 
 module.exports = router;
