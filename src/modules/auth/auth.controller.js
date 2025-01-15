@@ -276,7 +276,7 @@ exports.resetPassword = async (req, res, next) => {
 
     await ResetPasswordModel.findOneAndDelete({ _id: resetPassword._id });
 
-    req.flash("error", "Password reset successfully");
+    req.flash("success", "Password reset successfully");
     return res.redirect("/auth/login");
   } catch (err) {
     next(err)

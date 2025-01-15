@@ -51,11 +51,19 @@
               id="profileButton"
               class="w-full h-full bg-transparent border-none"
             >
-              <img
-                src="/images/profile-8.jpg"
+              <% if (page.profilePicture) {%>
+                <img
+                src="http://localhost:5000/<%= page.profilePicture %>"
                 class="object-cover"
                 alt="profile cover"
               />
+              <%} else {%>
+                <img
+                  src="http://localhost:5000/images/profile/default-user.png"
+                  class="object-cover"
+                  alt="profile cover"
+                />
+              <%}%>
             </button>
           </div>
         </div>
@@ -74,8 +82,19 @@
 
             <!-- Profile Image -->
             <span class="profile-pic-card">
-              <img src="http://localhost:5000/<%= page.profilePicture %>" class="profile-pic" alt="" />
-            </span>
+              <% if (page.profilePicture) {%>
+                <img
+                src="http://localhost:5000/<%= page.profilePicture %>"
+                class="object-cover"
+                alt="profile cover"
+              />
+              <%} else {%>
+                <img
+                  src="http://localhost:5000/images/profile/default-user.png"
+                  class="object-cover"
+                  alt="profile cover"
+                />
+              <%}%>            </span>
           </header>
           <main class="profile-main">
             <!-- Content -->
@@ -188,11 +207,19 @@
                 <article class="profile-feed-card">
                   <div>
                     <header>
-                      <img
+                      <% if (page.profilePicture) {%>
+                        <img
                         src="http://localhost:5000/<%= post.user.profilePicture %>"
                         alt="profile picture"
                         class="feed-profile-picture"
                       />
+                      <%} else {%>
+                        <img
+                          src="http://localhost:5000/images/profile/default-user.png"
+                          class="object-cover"
+                          alt="profile cover"
+                        />
+                      <%}%>
                     </header>
                   </div>
                   <div class="w-full">
