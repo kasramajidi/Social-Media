@@ -1,11 +1,16 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
+const nodeMailer = require("nodemailer")
 const { errorResponse, successResponse } = require("../../utils/responses");
 const UserModel = require("./../../models/User");
 const RefreshTokenModel = require("./../../models/RefreshToken");
+const ResetPasswordModel = require("../../models/ResetPassword")
 const {
   registerValidationSchema,
   loginValidationSchema,
+  forgetPasswordValidationSchema,
+  resetPasswordValidationSchema
 } = require("./auth.validator");
 
 exports.showRegisterView = async (req, res) => {
@@ -151,7 +156,7 @@ exports.refreshToken = async (req, res, next) => {
       //! Error code
     }
 
-    const accessToken = jwt.sign({userID: user._id}, process.env.JWT_SECRET, {
+    const accessToken = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, {
       expiresIn: "30day"
     })
 
@@ -167,6 +172,112 @@ exports.refreshToken = async (req, res, next) => {
       httpOnly: true
     });
 
+  } catch (err) {
+    next(err)
+  }
+}
+
+exports.showForgetPasswordView = async (req, res, next) => {
+  return res.render("auth/forget-password")
+}
+
+exports.showResetPasswordView = async (req, res, next) => {
+  return res.render("auth/reset-password")
+}
+
+exports.forgetPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    await forgetPasswordValidationSchema.validate(
+      { email },
+      { abortEarly: true }
+    );
+
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      //! Error
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    const resetTokenExpireTime = Date.now() + 1000 * 60 * 60;
+
+    const resetPassword = new ResetPasswordModel({
+      user: user._id,
+      token: resetToken,
+      tokenExpireTime: resetTokenExpireTime,
+    });
+
+    resetPassword.save();
+
+    const transporter = nodeMailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "ce01010101it@gmail.com",
+        pass: "uyar ralp koas xhxa",
+      },
+    });
+
+    const mailOptions = {
+      from: "ce01010101it@gmail.com",
+      to: email,
+      subject: "Reset Password Link For Your Social account",
+      html: `
+       <h2>Hi, ${user.name}</h2>
+       <a href=http://localhost:${process.env.PORT}/auth/reset-password/${resetToken}>Reset Password</a>
+      `,
+    };
+
+    transporter.sendMail(mailOptions);
+
+    req.flash("success", "Password reset email sent");
+    return res.redirect("back");
+
+  } catch (err) {
+    next(err)
+  }
+}
+
+
+exports.resetPassword = async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+
+    await resetPasswordValidationSchema.validate(
+      { token, password },
+      { abortEarly: true }
+    );
+
+    const resetPassword = await ResetPasswordModel.findOne({
+      token,
+      tokenExpireTime: { $gt: Date.now() },
+    });
+
+    if (!resetPassword) {
+      req.flash("error", "Invalid or expired token !!");
+      return res.redirect("back");
+    }
+
+    const user = await UserModel.findOne({ _id: resetPassword.user });
+
+    if (!user) {
+      //! Error
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await UserModel.findOneAndUpdate(
+      { _id: user._id },
+      {
+        password: hashedPassword,
+      }
+    );
+
+    await ResetPasswordModel.findOneAndDelete({ _id: resetPassword._id });
+
+    req.flash("error", "Password reset successfully");
+    return res.redirect("/auth/login");
   } catch (err) {
     next(err)
   }

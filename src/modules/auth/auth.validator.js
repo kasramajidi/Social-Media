@@ -33,3 +33,19 @@ exports.loginValidationSchema = yup.object({
     .min(8, "Password must be at least 8 chars long")
     .required("Password is required"),
 });
+
+
+exports.forgetPasswordValidationSchema = yup.object({
+  email: yup
+    .string()
+    .email("Please enter a valid email")
+    .required("Email is required"),
+});
+
+exports.resetPasswordValidationSchema = yup.object({
+  token: yup.string().required("Reset Token is required !"),
+  password: yup
+    .string()
+    .min(8, "Password must be at least 8 chars ...")
+    .required("Password is required"),
+});
