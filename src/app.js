@@ -11,6 +11,7 @@ const authRoutes = require("./modules/auth/auth.routes");
 const postRoutes = require("./modules/post/post.routes");
 const pageRoutes = require("./modules/page/page.routes");
 const userRouter = require("./modules/user/user.routes");
+const apiRouter = require("./modules/api/swagger.routes")
 
 
 const app = express();
@@ -48,6 +49,7 @@ app.set("views", path.join(__dirname, "views"));
 
 //* Routes
 app.use("/", homeRouter)
+app.use("/api", apiRouter)
 app.use("/auth", authRoutes);
 app.use("/posts", postRoutes);
 app.use("/pages", pageRoutes);

@@ -1,0 +1,118 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+      "title": "<Sabzlearn - Social Media ❤️ />",
+      "description": "Description For Social Media Project",
+      "version": "1.0.0"
+    },
+    "components": {
+      "securitySchemes": {
+        "Authorization": {
+          "type": "apiKey",
+          "name": "Authorization",
+          "scheme": "bearer",
+          "in": "header",
+          "description": "User token form authorization: **Bearer [user_token]**"
+        }
+      }
+    },
+    "tags": [
+      {
+        "name": "Auth",
+        "description": "All routes about user auth"
+      },
+      {
+        "name": "Post",
+        "description": "all routes for manipulate posts"
+      },
+      {
+        "name": "Comment",
+        "description": ""
+      },
+      {
+        "name": "Page",
+        "description": ""
+      },
+      {
+        "name": "User",
+        "description": ""
+      }
+    ],
+    "paths": {
+      "/auth/register": {
+        "post": {
+          "tags": ["Auth"],
+          "summary": "Register User",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "email": "amin@gmail.com",
+                    "username": "amin_saeedi",
+                    "name": "Amin SaeediRad",
+                    "password": "amin1212"
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "successfully register"
+            },
+            "400": {
+              "description": "request body is not valid"
+            }
+          }
+        }
+      },
+      "/pages/{pageID}": {
+        "get": {
+          "tags": ["Page"],
+          "summary": "Get page data",
+          "parameters": [
+            {
+              "name": "pageID",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "successfully response"
+            }
+          }
+        }
+      },
+      "/pages/{pageID}/follow": {
+        "post": {
+          "tags": ["Page"],
+          "summary": "Follow page",
+          "requestBody": {
+            "content": {}
+          },
+          "security": [
+            {
+              "Authorization": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "pageID",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "successfully response"
+            }
+          }
+        }
+      }
+    }
+  }
