@@ -8,6 +8,9 @@ router
   .get(controller.showRegisterView)
   .post(controller.register);
 
+
+router 
+  .route("/refresh", controller.refreshToken)
 router.route("/login").get(controller.showLoginView).post(controller.login);
 
 module.exports = router;

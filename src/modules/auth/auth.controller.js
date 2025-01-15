@@ -131,3 +131,43 @@ exports.login = async (req, res, next) => {
     next(err);
   }
 };
+
+
+exports.refreshToken = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body
+
+    const userID = await RefreshTokenModel.verifyToken(refreshToken)
+
+    if (!userID) {
+      //! Error code
+    }
+
+    await RefreshTokenModel.findOneAndDelete({ token: refreshToken })
+
+    const user = await RefreshTokenModel.findOne({ _id: userID })
+
+    if (!user) {
+      //! Error code
+    }
+
+    const accessToken = jwt.sign({userID: user._id}, process.env.JWT_SECRET, {
+      expiresIn: "30day"
+    })
+
+    const newRefreshToken = await RefreshTokenModel.createToken(user)
+
+    res.cookie("access-token", accessToken, {
+      maxAge: 900_000,
+      httpOnly: true
+    });
+
+    res.cookie("refresh-token", newRefreshToken, {
+      maxAge: 900_000,
+      httpOnly: true
+    });
+
+  } catch (err) {
+    next(err)
+  }
+}
